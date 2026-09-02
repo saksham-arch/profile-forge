@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "profile-forge"
+version = "0.1.0"
+description = "Structured deterministic Python profiling"
+requires-python = ">=3.9"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+profile-forge = "profile_forge.__main__:main"
+
