@@ -26,6 +26,24 @@ class ProfilerTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             load_target("missing_separator")
 
+    def test_profiles_repeated_invocations(self) -> None:
+        calls = 0
+
+        def operation() -> int:
+            nonlocal calls
+            calls += 1
+            return calls
+
+        result, records = profile_callable(operation, limit=50, repeat=3)
+        self.assertEqual(result, 3)
+        self.assertEqual(calls, 3)
+        operation_stat = next(item for item in records if item.function == "operation")
+        self.assertEqual(operation_stat.total_calls, 3)
+
+    def test_rejects_invalid_repeat(self) -> None:
+        with self.assertRaises(ValueError):
+            profile_callable(profiled_operation, repeat=0)
+
 
 if __name__ == "__main__":
     unittest.main()

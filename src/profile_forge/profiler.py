@@ -17,11 +17,23 @@ class FunctionStat:
     cumulative_seconds: float
 
 
-def profile_callable(operation: Callable[[], T], limit: int = 20) -> tuple[T, list[FunctionStat]]:
+def profile_callable(
+    operation: Callable[[], T],
+    limit: int = 20,
+    *,
+    repeat: int = 1,
+) -> tuple[T, list[FunctionStat]]:
     if limit < 1:
         raise ValueError("limit must be positive")
+    if repeat < 1:
+        raise ValueError("repeat must be positive")
     profiler = cProfile.Profile()
-    result = profiler.runcall(operation)
+    profiler.enable()
+    try:
+        for _ in range(repeat):
+            result = operation()
+    finally:
+        profiler.disable()
     raw_stats = pstats.Stats(profiler).stats
     records = [
         FunctionStat(
@@ -37,4 +49,3 @@ def profile_callable(operation: Callable[[], T], limit: int = 20) -> tuple[T, li
     ]
     records.sort(key=lambda item: (-item.cumulative_seconds, -item.self_seconds, item.function))
     return result, records[:limit]
-

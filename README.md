@@ -5,11 +5,11 @@ profiler. It converts profiler records into structured JSON sorted by
 cumulative time, while keeping call counts and source locations visible.
 
 ```bash
-PYTHONPATH=src python3 -m profile_forge package.module:function --limit 20
+PYTHONPATH=src python3 -m profile_forge package.module:function --limit 20 --repeat 5
 python3 -m unittest discover -s tests
 ```
 
-The target must be a zero-argument callable. Profiling changes execution
+The target must be a zero-argument callable. Repeated invocations accumulate in
+one profile and the final return value is preserved. Profiling changes execution
 characteristics, so these results identify investigation targets rather than
 production timing claims.
-
