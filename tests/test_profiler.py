@@ -15,6 +15,7 @@ class ProfilerTests(unittest.TestCase):
         functions = {record.function for record in records}
         self.assertIn("profiled_operation", functions)
         self.assertTrue(all(record.cumulative_seconds >= 0 for record in records))
+        self.assertTrue(all(record.self_per_call_seconds >= 0 for record in records))
 
     def test_respects_limit(self) -> None:
         _, records = profile_callable(profiled_operation, limit=1)
@@ -39,6 +40,15 @@ class ProfilerTests(unittest.TestCase):
         self.assertEqual(calls, 3)
         operation_stat = next(item for item in records if item.function == "operation")
         self.assertEqual(operation_stat.total_calls, 3)
+        self.assertAlmostEqual(
+            operation_stat.self_per_call_seconds * operation_stat.total_calls,
+            operation_stat.self_seconds,
+        )
+        self.assertAlmostEqual(
+            operation_stat.cumulative_per_primitive_call_seconds
+            * operation_stat.primitive_calls,
+            operation_stat.cumulative_seconds,
+        )
 
     def test_rejects_invalid_repeat(self) -> None:
         with self.assertRaises(ValueError):

@@ -14,7 +14,9 @@ class FunctionStat:
     primitive_calls: int
     total_calls: int
     self_seconds: float
+    self_per_call_seconds: float
     cumulative_seconds: float
+    cumulative_per_primitive_call_seconds: float
 
 
 def profile_callable(
@@ -43,7 +45,9 @@ def profile_callable(
             primitive_calls=value[0],
             total_calls=value[1],
             self_seconds=value[2],
+            self_per_call_seconds=value[2] / value[1],
             cumulative_seconds=value[3],
+            cumulative_per_primitive_call_seconds=value[3] / value[0],
         )
         for key, value in raw_stats.items()
     ]

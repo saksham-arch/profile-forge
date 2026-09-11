@@ -13,3 +13,7 @@ The target must be a zero-argument callable. Repeated invocations accumulate in
 one profile and the final return value is preserved. Profiling changes execution
 characteristics, so these results identify investigation targets rather than
 production timing claims.
+
+Function records include total self and cumulative time alongside per-call
+values. Self time is divided by total calls; cumulative time is divided by
+primitive calls, matching the distinction used by `pstats` for recursive code.
