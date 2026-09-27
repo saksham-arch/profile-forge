@@ -6,6 +6,7 @@ cumulative time, while keeping call counts and source locations visible.
 
 ```bash
 PYTHONPATH=src python3 -m profile_forge package.module:function --limit 20 --repeat 5
+PYTHONPATH=src python3 -m profile_forge package.module:function --sort-by self
 python3 -m unittest discover -s tests
 ```
 
@@ -17,3 +18,6 @@ production timing claims.
 Function records include total self and cumulative time alongside per-call
 values. Self time is divided by total calls; cumulative time is divided by
 primitive calls, matching the distinction used by `pstats` for recursive code.
+Records can be ranked by cumulative time, self time, or total calls. Ranking
+changes which records are selected by `--limit`; it does not change the
+underlying profile or imply that the first record is automatically a defect.

@@ -24,11 +24,14 @@ def profile_callable(
     limit: int = 20,
     *,
     repeat: int = 1,
+    sort_by: str = "cumulative",
 ) -> tuple[T, list[FunctionStat]]:
     if limit < 1:
         raise ValueError("limit must be positive")
     if repeat < 1:
         raise ValueError("repeat must be positive")
+    if sort_by not in {"cumulative", "self", "calls"}:
+        raise ValueError("sort_by must be cumulative, self, or calls")
     profiler = cProfile.Profile()
     profiler.enable()
     try:
@@ -51,5 +54,28 @@ def profile_callable(
         )
         for key, value in raw_stats.items()
     ]
-    records.sort(key=lambda item: (-item.cumulative_seconds, -item.self_seconds, item.function))
+    sort_keys = {
+        "cumulative": lambda item: (
+            -item.cumulative_seconds,
+            -item.self_seconds,
+            item.filename,
+            item.line,
+            item.function,
+        ),
+        "self": lambda item: (
+            -item.self_seconds,
+            -item.cumulative_seconds,
+            item.filename,
+            item.line,
+            item.function,
+        ),
+        "calls": lambda item: (
+            -item.total_calls,
+            -item.cumulative_seconds,
+            item.filename,
+            item.line,
+            item.function,
+        ),
+    }
+    records.sort(key=sort_keys[sort_by])
     return result, records[:limit]

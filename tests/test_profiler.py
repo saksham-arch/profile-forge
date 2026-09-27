@@ -54,6 +54,22 @@ class ProfilerTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             profile_callable(profiled_operation, repeat=0)
 
+    def test_supports_self_time_and_call_count_rankings(self) -> None:
+        _, by_self = profile_callable(profiled_operation, limit=50, sort_by="self")
+        _, by_calls = profile_callable(profiled_operation, limit=50, sort_by="calls")
+        self.assertEqual(
+            [item.self_seconds for item in by_self],
+            sorted((item.self_seconds for item in by_self), reverse=True),
+        )
+        self.assertEqual(
+            [item.total_calls for item in by_calls],
+            sorted((item.total_calls for item in by_calls), reverse=True),
+        )
+
+    def test_rejects_unknown_ranking(self) -> None:
+        with self.assertRaises(ValueError):
+            profile_callable(profiled_operation, sort_by="unknown")
+
 
 if __name__ == "__main__":
     unittest.main()

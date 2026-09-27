@@ -23,9 +23,17 @@ def main() -> None:
     parser.add_argument("target", help="module:function")
     parser.add_argument("--limit", type=int, default=20)
     parser.add_argument("--repeat", type=int, default=1)
+    parser.add_argument(
+        "--sort-by",
+        choices=("cumulative", "self", "calls"),
+        default="cumulative",
+    )
     args = parser.parse_args()
     _, records = profile_callable(
-        load_target(args.target), args.limit, repeat=args.repeat
+        load_target(args.target),
+        args.limit,
+        repeat=args.repeat,
+        sort_by=args.sort_by,
     )
     print(json.dumps([asdict(record) for record in records], indent=2))
 
