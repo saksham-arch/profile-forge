@@ -70,6 +70,30 @@ class ProfilerTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             profile_callable(profiled_operation, sort_by="unknown")
 
+    def test_filters_records_by_literal_filename_text(self) -> None:
+        _, records = profile_callable(
+            profiled_operation,
+            limit=50,
+            filename_contains="test_profiler.py",
+        )
+        self.assertIn("profiled_operation", {item.function for item in records})
+        self.assertTrue(
+            all("test_profiler.py" in item.filename for item in records)
+        )
+
+    def test_filename_filter_is_applied_before_limit(self) -> None:
+        _, records = profile_callable(
+            profiled_operation,
+            limit=1,
+            filename_contains="test_profiler.py",
+        )
+        self.assertEqual(len(records), 1)
+        self.assertIn("test_profiler.py", records[0].filename)
+
+    def test_rejects_empty_filename_filter(self) -> None:
+        with self.assertRaises(ValueError):
+            profile_callable(profiled_operation, filename_contains="")
+
 
 if __name__ == "__main__":
     unittest.main()

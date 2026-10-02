@@ -24,6 +24,10 @@ def main() -> None:
     parser.add_argument("--limit", type=int, default=20)
     parser.add_argument("--repeat", type=int, default=1)
     parser.add_argument(
+        "--filename-contains",
+        help="keep records whose source filename contains this literal text",
+    )
+    parser.add_argument(
         "--sort-by",
         choices=("cumulative", "self", "calls"),
         default="cumulative",
@@ -34,6 +38,7 @@ def main() -> None:
         args.limit,
         repeat=args.repeat,
         sort_by=args.sort_by,
+        filename_contains=args.filename_contains,
     )
     print(json.dumps([asdict(record) for record in records], indent=2))
 

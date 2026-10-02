@@ -1,7 +1,7 @@
 import cProfile
 from dataclasses import dataclass
 import pstats
-from typing import Callable, TypeVar
+from typing import Callable, Optional, TypeVar
 
 T = TypeVar("T")
 
@@ -25,6 +25,7 @@ def profile_callable(
     *,
     repeat: int = 1,
     sort_by: str = "cumulative",
+    filename_contains: Optional[str] = None,
 ) -> tuple[T, list[FunctionStat]]:
     if limit < 1:
         raise ValueError("limit must be positive")
@@ -32,6 +33,8 @@ def profile_callable(
         raise ValueError("repeat must be positive")
     if sort_by not in {"cumulative", "self", "calls"}:
         raise ValueError("sort_by must be cumulative, self, or calls")
+    if filename_contains == "":
+        raise ValueError("filename_contains must not be empty")
     profiler = cProfile.Profile()
     profiler.enable()
     try:
@@ -53,6 +56,7 @@ def profile_callable(
             cumulative_per_primitive_call_seconds=value[3] / value[0],
         )
         for key, value in raw_stats.items()
+        if filename_contains is None or filename_contains in key[0]
     ]
     sort_keys = {
         "cumulative": lambda item: (
