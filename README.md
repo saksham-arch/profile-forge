@@ -8,6 +8,7 @@ cumulative time, while keeping call counts and source locations visible.
 PYTHONPATH=src python3 -m profile_forge package.module:function --limit 20 --repeat 5
 PYTHONPATH=src python3 -m profile_forge package.module:function --sort-by self
 PYTHONPATH=src python3 -m profile_forge package.module:function --filename-contains package/
+PYTHONPATH=src python3 -m profile_forge package.module:function --minimum-self-seconds 0.001
 python3 -m unittest discover -s tests
 ```
 
@@ -25,3 +26,7 @@ underlying profile or imply that the first record is automatically a defect.
 `--filename-contains` applies a literal, case-sensitive source-filename filter
 before ranking and `--limit`. It can focus output on application modules, but
 excluded library and runtime work still contributes to the profiled execution.
+`--minimum-self-seconds` removes records below a caller-selected total self-time
+floor before ranking and limiting. It is a display filter, not a significance
+test, and appropriate thresholds depend on workload duration and profiler
+overhead.

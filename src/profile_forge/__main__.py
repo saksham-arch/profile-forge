@@ -28,6 +28,12 @@ def main() -> None:
         help="keep records whose source filename contains this literal text",
     )
     parser.add_argument(
+        "--minimum-self-seconds",
+        type=float,
+        default=0,
+        help="keep records with at least this much total self time",
+    )
+    parser.add_argument(
         "--sort-by",
         choices=("cumulative", "self", "calls"),
         default="cumulative",
@@ -39,6 +45,7 @@ def main() -> None:
         repeat=args.repeat,
         sort_by=args.sort_by,
         filename_contains=args.filename_contains,
+        minimum_self_seconds=args.minimum_self_seconds,
     )
     print(json.dumps([asdict(record) for record in records], indent=2))
 

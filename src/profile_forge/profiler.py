@@ -1,5 +1,6 @@
 import cProfile
 from dataclasses import dataclass
+from math import isfinite
 import pstats
 from typing import Callable, Optional, TypeVar
 
@@ -26,6 +27,7 @@ def profile_callable(
     repeat: int = 1,
     sort_by: str = "cumulative",
     filename_contains: Optional[str] = None,
+    minimum_self_seconds: float = 0,
 ) -> tuple[T, list[FunctionStat]]:
     if limit < 1:
         raise ValueError("limit must be positive")
@@ -35,6 +37,8 @@ def profile_callable(
         raise ValueError("sort_by must be cumulative, self, or calls")
     if filename_contains == "":
         raise ValueError("filename_contains must not be empty")
+    if not isfinite(minimum_self_seconds) or minimum_self_seconds < 0:
+        raise ValueError("minimum_self_seconds must be finite and non-negative")
     profiler = cProfile.Profile()
     profiler.enable()
     try:
@@ -56,7 +60,8 @@ def profile_callable(
             cumulative_per_primitive_call_seconds=value[3] / value[0],
         )
         for key, value in raw_stats.items()
-        if filename_contains is None or filename_contains in key[0]
+        if (filename_contains is None or filename_contains in key[0])
+        and value[2] >= minimum_self_seconds
     ]
     sort_keys = {
         "cumulative": lambda item: (
