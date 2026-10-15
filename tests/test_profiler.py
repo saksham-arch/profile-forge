@@ -94,6 +94,27 @@ class ProfilerTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             profile_callable(profiled_operation, filename_contains="")
 
+    def test_filters_records_by_literal_function_text(self) -> None:
+        _, records = profile_callable(
+            profiled_operation,
+            limit=50,
+            function_contains="profiled_oper",
+        )
+        self.assertEqual([item.function for item in records], ["profiled_operation"])
+
+    def test_function_filter_is_applied_before_limit(self) -> None:
+        _, records = profile_callable(
+            profiled_operation,
+            limit=1,
+            function_contains="profiled_operation",
+        )
+        self.assertEqual(len(records), 1)
+        self.assertEqual(records[0].function, "profiled_operation")
+
+    def test_rejects_empty_function_filter(self) -> None:
+        with self.assertRaises(ValueError):
+            profile_callable(profiled_operation, function_contains="")
+
     def test_filters_records_by_minimum_self_time(self) -> None:
         _, records = profile_callable(
             profiled_operation,

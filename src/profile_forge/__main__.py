@@ -28,6 +28,10 @@ def main() -> None:
         help="keep records whose source filename contains this literal text",
     )
     parser.add_argument(
+        "--function-contains",
+        help="keep records whose profiler function label contains this literal text",
+    )
+    parser.add_argument(
         "--minimum-self-seconds",
         type=float,
         default=0,
@@ -45,6 +49,7 @@ def main() -> None:
         repeat=args.repeat,
         sort_by=args.sort_by,
         filename_contains=args.filename_contains,
+        function_contains=args.function_contains,
         minimum_self_seconds=args.minimum_self_seconds,
     )
     print(json.dumps([asdict(record) for record in records], indent=2))

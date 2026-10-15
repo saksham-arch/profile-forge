@@ -27,6 +27,7 @@ def profile_callable(
     repeat: int = 1,
     sort_by: str = "cumulative",
     filename_contains: Optional[str] = None,
+    function_contains: Optional[str] = None,
     minimum_self_seconds: float = 0,
 ) -> tuple[T, list[FunctionStat]]:
     if limit < 1:
@@ -37,6 +38,8 @@ def profile_callable(
         raise ValueError("sort_by must be cumulative, self, or calls")
     if filename_contains == "":
         raise ValueError("filename_contains must not be empty")
+    if function_contains == "":
+        raise ValueError("function_contains must not be empty")
     if not isfinite(minimum_self_seconds) or minimum_self_seconds < 0:
         raise ValueError("minimum_self_seconds must be finite and non-negative")
     profiler = cProfile.Profile()
@@ -61,6 +64,7 @@ def profile_callable(
         )
         for key, value in raw_stats.items()
         if (filename_contains is None or filename_contains in key[0])
+        and (function_contains is None or function_contains in key[2])
         and value[2] >= minimum_self_seconds
     ]
     sort_keys = {
