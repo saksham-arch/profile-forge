@@ -10,7 +10,8 @@ PYTHONPATH=src python3 -m profile_forge package.module:function --sort-by self
 PYTHONPATH=src python3 -m profile_forge package.module:function --filename-contains package/
 PYTHONPATH=src python3 -m profile_forge package.module:function --function-contains parse
 PYTHONPATH=src python3 -m profile_forge package.module:function --minimum-self-seconds 0.001
-python3 -m unittest discover -s tests
+PYTHONPATH=src python3 -m profile_forge package.module:function --minimum-cumulative-seconds 0.005
+PYTHONPATH=src python3 -m unittest discover -s tests
 ```
 
 The target must be a zero-argument callable. Repeated invocations accumulate in
@@ -35,3 +36,8 @@ Python's profiler-specific notation.
 floor before ranking and limiting. It is a display filter, not a significance
 test, and appropriate thresholds depend on workload duration and profiler
 overhead.
+`--minimum-cumulative-seconds` applies the same kind of caller-selected floor
+to cumulative time. It can retain wrappers that spend little time in their own
+body but lead to expensive downstream calls. Cumulative time overlaps across
+the call tree, so matching records must not be added together as independent
+costs.

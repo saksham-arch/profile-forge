@@ -131,6 +131,22 @@ class ProfilerTests(unittest.TestCase):
                     minimum_self_seconds=threshold,
                 )
 
+    def test_filters_records_by_minimum_cumulative_time(self) -> None:
+        _, records = profile_callable(
+            profiled_operation,
+            limit=50,
+            minimum_cumulative_seconds=1,
+        )
+        self.assertEqual(records, [])
+
+    def test_rejects_invalid_minimum_cumulative_time(self) -> None:
+        for threshold in (-1, float("inf"), float("nan")):
+            with self.subTest(threshold=threshold), self.assertRaises(ValueError):
+                profile_callable(
+                    profiled_operation,
+                    minimum_cumulative_seconds=threshold,
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

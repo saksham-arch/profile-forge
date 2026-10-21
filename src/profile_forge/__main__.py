@@ -38,6 +38,12 @@ def main() -> None:
         help="keep records with at least this much total self time",
     )
     parser.add_argument(
+        "--minimum-cumulative-seconds",
+        type=float,
+        default=0,
+        help="keep records with at least this much cumulative time",
+    )
+    parser.add_argument(
         "--sort-by",
         choices=("cumulative", "self", "calls"),
         default="cumulative",
@@ -51,6 +57,7 @@ def main() -> None:
         filename_contains=args.filename_contains,
         function_contains=args.function_contains,
         minimum_self_seconds=args.minimum_self_seconds,
+        minimum_cumulative_seconds=args.minimum_cumulative_seconds,
     )
     print(json.dumps([asdict(record) for record in records], indent=2))
 
