@@ -66,6 +66,38 @@ class ProfilerTests(unittest.TestCase):
             sorted((item.total_calls for item in by_calls), reverse=True),
         )
 
+    def test_supports_per_call_rankings(self) -> None:
+        _, by_self_call = profile_callable(
+            profiled_operation,
+            limit=50,
+            sort_by="self-per-call",
+        )
+        _, by_cumulative_call = profile_callable(
+            profiled_operation,
+            limit=50,
+            sort_by="cumulative-per-call",
+        )
+        self.assertEqual(
+            [item.self_per_call_seconds for item in by_self_call],
+            sorted(
+                (item.self_per_call_seconds for item in by_self_call),
+                reverse=True,
+            ),
+        )
+        self.assertEqual(
+            [
+                item.cumulative_per_primitive_call_seconds
+                for item in by_cumulative_call
+            ],
+            sorted(
+                (
+                    item.cumulative_per_primitive_call_seconds
+                    for item in by_cumulative_call
+                ),
+                reverse=True,
+            ),
+        )
+
     def test_rejects_unknown_ranking(self) -> None:
         with self.assertRaises(ValueError):
             profile_callable(profiled_operation, sort_by="unknown")

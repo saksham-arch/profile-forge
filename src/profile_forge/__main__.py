@@ -45,7 +45,13 @@ def main() -> None:
     )
     parser.add_argument(
         "--sort-by",
-        choices=("cumulative", "self", "calls"),
+        choices=(
+            "cumulative",
+            "self",
+            "calls",
+            "self-per-call",
+            "cumulative-per-call",
+        ),
         default="cumulative",
     )
     args = parser.parse_args()

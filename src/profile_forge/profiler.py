@@ -35,8 +35,18 @@ def profile_callable(
         raise ValueError("limit must be positive")
     if repeat < 1:
         raise ValueError("repeat must be positive")
-    if sort_by not in {"cumulative", "self", "calls"}:
-        raise ValueError("sort_by must be cumulative, self, or calls")
+    ranking_names = {
+        "cumulative",
+        "self",
+        "calls",
+        "self-per-call",
+        "cumulative-per-call",
+    }
+    if sort_by not in ranking_names:
+        raise ValueError(
+            "sort_by must be cumulative, self, calls, self-per-call, "
+            "or cumulative-per-call"
+        )
     if filename_contains == "":
         raise ValueError("filename_contains must not be empty")
     if function_contains == "":
@@ -93,6 +103,20 @@ def profile_callable(
         ),
         "calls": lambda item: (
             -item.total_calls,
+            -item.cumulative_seconds,
+            item.filename,
+            item.line,
+            item.function,
+        ),
+        "self-per-call": lambda item: (
+            -item.self_per_call_seconds,
+            -item.self_seconds,
+            item.filename,
+            item.line,
+            item.function,
+        ),
+        "cumulative-per-call": lambda item: (
+            -item.cumulative_per_primitive_call_seconds,
             -item.cumulative_seconds,
             item.filename,
             item.line,

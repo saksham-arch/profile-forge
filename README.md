@@ -7,6 +7,7 @@ cumulative time, while keeping call counts and source locations visible.
 ```bash
 PYTHONPATH=src python3 -m profile_forge package.module:function --limit 20 --repeat 5
 PYTHONPATH=src python3 -m profile_forge package.module:function --sort-by self
+PYTHONPATH=src python3 -m profile_forge package.module:function --sort-by self-per-call
 PYTHONPATH=src python3 -m profile_forge package.module:function --filename-contains package/
 PYTHONPATH=src python3 -m profile_forge package.module:function --function-contains parse
 PYTHONPATH=src python3 -m profile_forge package.module:function --minimum-self-seconds 0.001
@@ -22,9 +23,12 @@ production timing claims.
 Function records include total self and cumulative time alongside per-call
 values. Self time is divided by total calls; cumulative time is divided by
 primitive calls, matching the distinction used by `pstats` for recursive code.
-Records can be ranked by cumulative time, self time, or total calls. Ranking
-changes which records are selected by `--limit`; it does not change the
-underlying profile or imply that the first record is automatically a defect.
+Records can be ranked by cumulative time, self time, total calls, self time per
+call, or cumulative time per primitive call. Per-call rankings surface costly
+individual invocations while total-time rankings surface aggregate cost; both
+can be useful, and neither establishes that the first record is a defect.
+Ranking changes which records are selected by `--limit`; it does not change the
+underlying profile.
 `--filename-contains` applies a literal, case-sensitive source-filename filter
 before ranking and `--limit`. It can focus output on application modules, but
 excluded library and runtime work still contributes to the profiled execution.
