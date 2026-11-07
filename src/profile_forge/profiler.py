@@ -30,11 +30,14 @@ def profile_callable(
     function_contains: Optional[str] = None,
     minimum_self_seconds: float = 0,
     minimum_cumulative_seconds: float = 0,
+    minimum_calls: int = 0,
 ) -> tuple[T, list[FunctionStat]]:
     if limit < 1:
         raise ValueError("limit must be positive")
     if repeat < 1:
         raise ValueError("repeat must be positive")
+    if minimum_calls < 0:
+        raise ValueError("minimum_calls must be non-negative")
     ranking_names = {
         "cumulative",
         "self",
@@ -85,6 +88,7 @@ def profile_callable(
         and (function_contains is None or function_contains in key[2])
         and value[2] >= minimum_self_seconds
         and value[3] >= minimum_cumulative_seconds
+        and value[1] >= minimum_calls
     ]
     sort_keys = {
         "cumulative": lambda item: (

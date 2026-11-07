@@ -54,6 +54,17 @@ class ProfilerTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             profile_callable(profiled_operation, repeat=0)
 
+    def test_filters_by_total_call_count_before_limiting(self) -> None:
+        _, records = profile_callable(
+            profiled_operation, repeat=3, limit=1, minimum_calls=3
+        )
+        self.assertEqual(len(records), 1)
+        self.assertGreaterEqual(records[0].total_calls, 3)
+
+    def test_rejects_negative_minimum_calls(self) -> None:
+        with self.assertRaises(ValueError):
+            profile_callable(profiled_operation, minimum_calls=-1)
+
     def test_supports_self_time_and_call_count_rankings(self) -> None:
         _, by_self = profile_callable(profiled_operation, limit=50, sort_by="self")
         _, by_calls = profile_callable(profiled_operation, limit=50, sort_by="calls")

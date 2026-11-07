@@ -23,6 +23,7 @@ def main() -> None:
     parser.add_argument("target", help="module:function")
     parser.add_argument("--limit", type=int, default=20)
     parser.add_argument("--repeat", type=int, default=1)
+    parser.add_argument("--minimum-calls", type=int, default=0)
     parser.add_argument(
         "--filename-contains",
         help="keep records whose source filename contains this literal text",
@@ -64,6 +65,7 @@ def main() -> None:
         function_contains=args.function_contains,
         minimum_self_seconds=args.minimum_self_seconds,
         minimum_cumulative_seconds=args.minimum_cumulative_seconds,
+        minimum_calls=args.minimum_calls,
     )
     print(json.dumps([asdict(record) for record in records], indent=2))
 
