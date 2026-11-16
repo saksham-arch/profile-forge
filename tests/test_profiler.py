@@ -27,6 +27,14 @@ class ProfilerTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             load_target("missing_separator")
 
+    def test_loads_qualified_callable(self) -> None:
+        from pathlib import Path
+
+        self.assertEqual(load_target("pathlib:Path.cwd")(), Path.cwd())
+        for specification in ("pathlib:", "pathlib:Path.", ":Path"):
+            with self.subTest(specification=specification), self.assertRaises(ValueError):
+                load_target(specification)
+
     def test_profiles_repeated_invocations(self) -> None:
         calls = 0
 

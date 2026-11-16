@@ -20,6 +20,8 @@ The target must be a zero-argument callable. Repeated invocations accumulate in
 one profile and the final return value is preserved. Profiling changes execution
 characteristics, so these results identify investigation targets rather than
 production timing claims.
+Qualified attributes are supported, for example `pathlib:Path.cwd`; the
+callable still must accept no arguments.
 
 Function records include total self and cumulative time alongside per-call
 values. Self time is divided by total calls; cumulative time is divided by

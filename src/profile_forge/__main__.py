@@ -12,7 +12,11 @@ def load_target(specification: str) -> Callable[[], object]:
         module_name, attribute = specification.split(":", maxsplit=1)
     except ValueError as error:
         raise ValueError("target must use module:function syntax") from error
-    target = getattr(importlib.import_module(module_name), attribute)
+    if not module_name or not attribute or any(not part for part in attribute.split(".")):
+        raise ValueError("target must use module:qualified.function syntax")
+    target = importlib.import_module(module_name)
+    for part in attribute.split("."):
+        target = getattr(target, part)
     if not callable(target):
         raise TypeError("target must be callable")
     return target
