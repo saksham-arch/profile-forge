@@ -73,6 +73,43 @@ class ProfilerTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             profile_callable(profiled_operation, minimum_calls=-1)
 
+    def test_filters_and_ranks_by_primitive_calls(self) -> None:
+        _, records = profile_callable(
+            profiled_operation,
+            repeat=3,
+            limit=50,
+            minimum_primitive_calls=3,
+            sort_by="primitive-calls",
+        )
+        self.assertTrue(records)
+        self.assertTrue(all(item.primitive_calls >= 3 for item in records))
+        self.assertEqual(
+            [item.primitive_calls for item in records],
+            sorted((item.primitive_calls for item in records), reverse=True),
+        )
+
+    def test_rejects_negative_minimum_primitive_calls(self) -> None:
+        with self.assertRaises(ValueError):
+            profile_callable(profiled_operation, minimum_primitive_calls=-1)
+
+    def test_primitive_calls_distinguish_recursive_entries(self) -> None:
+        def recurse(depth: int) -> None:
+            if depth:
+                recurse(depth - 1)
+
+        def operation() -> None:
+            recurse(3)
+
+        _, records = profile_callable(
+            operation,
+            repeat=2,
+            function_contains="recurse",
+            minimum_primitive_calls=2,
+        )
+        self.assertEqual(len(records), 1)
+        self.assertEqual(records[0].primitive_calls, 2)
+        self.assertEqual(records[0].total_calls, 8)
+
     def test_supports_self_time_and_call_count_rankings(self) -> None:
         _, by_self = profile_callable(profiled_operation, limit=50, sort_by="self")
         _, by_calls = profile_callable(profiled_operation, limit=50, sort_by="calls")

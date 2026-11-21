@@ -13,6 +13,7 @@ PYTHONPATH=src python3 -m profile_forge package.module:function --function-conta
 PYTHONPATH=src python3 -m profile_forge package.module:function --minimum-self-seconds 0.001
 PYTHONPATH=src python3 -m profile_forge package.module:function --minimum-cumulative-seconds 0.005
 PYTHONPATH=src python3 -m profile_forge package.module:function --minimum-calls 10
+PYTHONPATH=src python3 -m profile_forge package.module:function --minimum-primitive-calls 10 --sort-by primitive-calls
 PYTHONPATH=src python3 -m unittest discover -s tests
 ```
 
@@ -53,3 +54,7 @@ costs.
 before ranking and limiting. It helps focus on frequently invoked functions;
 recursion can make total calls exceed primitive calls, and call count alone
 does not establish cost.
+
+`--minimum-primitive-calls` and `--sort-by primitive-calls` use non-recursive
+entries into a function. Comparing them with total calls can help identify
+recursion; neither count measures how much work an invocation performs.

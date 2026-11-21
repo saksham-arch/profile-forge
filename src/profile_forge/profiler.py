@@ -31,6 +31,7 @@ def profile_callable(
     minimum_self_seconds: float = 0,
     minimum_cumulative_seconds: float = 0,
     minimum_calls: int = 0,
+    minimum_primitive_calls: int = 0,
 ) -> tuple[T, list[FunctionStat]]:
     if limit < 1:
         raise ValueError("limit must be positive")
@@ -38,16 +39,19 @@ def profile_callable(
         raise ValueError("repeat must be positive")
     if minimum_calls < 0:
         raise ValueError("minimum_calls must be non-negative")
+    if minimum_primitive_calls < 0:
+        raise ValueError("minimum_primitive_calls must be non-negative")
     ranking_names = {
         "cumulative",
         "self",
         "calls",
+        "primitive-calls",
         "self-per-call",
         "cumulative-per-call",
     }
     if sort_by not in ranking_names:
         raise ValueError(
-            "sort_by must be cumulative, self, calls, self-per-call, "
+            "sort_by must be cumulative, self, calls, primitive-calls, self-per-call, "
             "or cumulative-per-call"
         )
     if filename_contains == "":
@@ -89,6 +93,7 @@ def profile_callable(
         and value[2] >= minimum_self_seconds
         and value[3] >= minimum_cumulative_seconds
         and value[1] >= minimum_calls
+        and value[0] >= minimum_primitive_calls
     ]
     sort_keys = {
         "cumulative": lambda item: (
@@ -107,6 +112,13 @@ def profile_callable(
         ),
         "calls": lambda item: (
             -item.total_calls,
+            -item.cumulative_seconds,
+            item.filename,
+            item.line,
+            item.function,
+        ),
+        "primitive-calls": lambda item: (
+            -item.primitive_calls,
             -item.cumulative_seconds,
             item.filename,
             item.line,
