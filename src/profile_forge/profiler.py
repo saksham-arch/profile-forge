@@ -15,6 +15,7 @@ class FunctionStat:
     primitive_calls: int
     total_calls: int
     self_seconds: float
+    self_time_share: Optional[float]
     self_per_call_seconds: float
     cumulative_seconds: float
     cumulative_per_primitive_call_seconds: float
@@ -75,6 +76,7 @@ def profile_callable(
     finally:
         profiler.disable()
     raw_stats = pstats.Stats(profiler).stats
+    total_self_seconds = sum(value[2] for value in raw_stats.values())
     records = [
         FunctionStat(
             filename=key[0],
@@ -83,6 +85,9 @@ def profile_callable(
             primitive_calls=value[0],
             total_calls=value[1],
             self_seconds=value[2],
+            self_time_share=(
+                value[2] / total_self_seconds if total_self_seconds > 0 else None
+            ),
             self_per_call_seconds=value[2] / value[1],
             cumulative_seconds=value[3],
             cumulative_per_primitive_call_seconds=value[3] / value[0],

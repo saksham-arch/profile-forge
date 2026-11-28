@@ -27,6 +27,12 @@ callable still must accept no arguments.
 Function records include total self and cumulative time alongside per-call
 values. Self time is divided by total calls; cumulative time is divided by
 primitive calls, matching the distinction used by `pstats` for recursive code.
+
+`self_time_share` divides each record's self time by total self time across the
+entire profile, before display filters and `--limit`. It is `null` if the total
+is zero. Shares describe where this profiling run spent its own function time;
+they are not CPU utilization or a prediction for other workloads.
+
 Records can be ranked by cumulative time, self time, total calls, self time per
 call, or cumulative time per primitive call. Per-call rankings surface costly
 individual invocations while total-time rankings surface aggregate cost; both

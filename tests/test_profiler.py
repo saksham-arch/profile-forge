@@ -16,6 +16,21 @@ class ProfilerTests(unittest.TestCase):
         self.assertIn("profiled_operation", functions)
         self.assertTrue(all(record.cumulative_seconds >= 0 for record in records))
         self.assertTrue(all(record.self_per_call_seconds >= 0 for record in records))
+        self.assertAlmostEqual(
+            sum(record.self_time_share or 0 for record in records),
+            1.0,
+        )
+
+    def test_filtered_self_time_share_uses_entire_profile(self) -> None:
+        _, all_records = profile_callable(profiled_operation, limit=50)
+        _, filtered = profile_callable(
+            profiled_operation,
+            limit=50,
+            function_contains="profiled_operation",
+        )
+        self.assertEqual(len(filtered), 1)
+        self.assertGreater(sum(item.self_time_share or 0 for item in all_records), 0)
+        self.assertLess(filtered[0].self_time_share, 1)
 
     def test_respects_limit(self) -> None:
         _, records = profile_callable(profiled_operation, limit=1)
